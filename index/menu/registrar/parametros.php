@@ -10,7 +10,7 @@
 
 <body>
     <form action="main.php" method="post">
-        <h2>Parámetros de Evaluación</h2>
+        <h2>Editar Parámetros de Evaluación</h2>
 
         <div class="form-group">
             <div class="full-width">
