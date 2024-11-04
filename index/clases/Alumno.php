@@ -14,25 +14,40 @@ class Alumno {
         public $parcial1,
         public $parcial2,
         public $final
-    ) {}
+    ) {}            
 
     public function nombreAlumno() {
         return $this->nombre;
     }
 
-    // registra o elimina asistencia
-    public static function gestionarAsistencia($id_alumno, $id_materia, $presente) {
-
+    // busca asistencia por fecha para marcar el check anterior
+    public static function obtenerAsistenciaPorFecha($id_materia, $fecha_asistencia) {
         $db = new Database();
         $conn = $db->connect();
     
-        $fecha_actual = date('Y-m-d');
+        $query = "SELECT id_alumno FROM asistencias WHERE id_materia = :id_materia AND fecha_asistencia = :fecha_asistencia";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
+        $stmt->bindParam(':fecha_asistencia', $fecha_asistencia, PDO::PARAM_STR);
+        $stmt->execute();
+    
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+    
+
+    // registra o elimina asistencia
+    public static function gestionarAsistencia($id_alumno, $id_materia, $presente, $fecha_asistencia = null) {
+        $db = new Database();
+        $conn = $db->connect();
+    
+        // fecha actual si no se selecciona una
+        $fecha_asistencia = $fecha_asistencia ?? date('Y-m-d');
     
         if ($presente) {
             // registra asistencia
             $query = "INSERT INTO asistencias (id_alumno, id_materia, fecha_asistencia) 
                       VALUES (:id_alumno, :id_materia, :fecha_asistencia)
-                      ON DUPLICATE KEY UPDATE fecha_asistencia = :fecha_asistencia"; // actualiza si existe
+                      ON DUPLICATE KEY UPDATE fecha_asistencia = :fecha_asistencia";
         } else {
             // elimina asistencia
             $query = "DELETE FROM asistencias 
@@ -42,9 +57,10 @@ class Alumno {
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':id_alumno', $id_alumno, PDO::PARAM_INT);
         $stmt->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-        $stmt->bindParam(':fecha_asistencia', $fecha_actual, PDO::PARAM_STR);
+        $stmt->bindParam(':fecha_asistencia', $fecha_asistencia, PDO::PARAM_STR);
         $stmt->execute();
     }
+    
     
 
     public static function gestionarNotas($id_alumno, $id_materia, $parcial1, $parcial2, $final) {
