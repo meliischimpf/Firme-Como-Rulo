@@ -42,11 +42,11 @@
         </svg>
         Seguimiento
        </a>
-       <a class="sidebar-link" href="#">
+       <a class="sidebar-link" href="../../menu/ingresar/listado_alumnos.php">
         <svg viewBox="0 0 24 24" fill="currentColor">
          <path fill-rule="evenodd" clip-rule="evenodd" d="M17.769 8.382H22C22 4.985 19.964 3 16.516 3H7.484C4.036 3 2 4.985 2 8.338v7.324C2 19.015 4.036 21 7.484 21h9.032C19.964 21 22 19.015 22 15.662v-.313h-4.231c-1.964 0-3.556-1.552-3.556-3.466 0-1.915 1.592-3.467 3.556-3.467v-.034zm0 1.49h3.484c.413 0 .747.326.747.728v2.531a.746.746 0 01-.747.728H17.85c-.994.013-1.864-.65-2.089-1.595a1.982 1.982 0 01.433-1.652 2.091 2.091 0 011.576-.74zm.151 2.661h.329a.755.755 0 00.764-.745.755.755 0 00-.764-.746h-.329a.766.766 0 00-.54.213.727.727 0 00-.224.524c0 .413.34.75.764.754zM6.738 8.382h5.644a.755.755 0 00.765-.746.755.755 0 00-.765-.745H6.738a.755.755 0 00-.765.737c0 .413.341.75.765.754z" />
         </svg>
-        -
+        Listado Alumnos
        </a>
       </div>
      </div>
@@ -85,213 +85,204 @@
       <h2>Seguimiento</h2>
       
       <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
+            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
+            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
+            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php'; 
 
-$db = new Database();
-$conn = $db->connect();
+            $db = new Database();
+            $conn = $db->connect();
+            $busqueda = new Busqueda($conn);
 
-// institutos
-$stmt_institutos = $conn->prepare("SELECT id_instituto, nombre_instituto FROM instituto");
-$stmt_institutos->execute();
-$result_institutos = $stmt_institutos->fetchAll(PDO::FETCH_ASSOC);
+            // institutos
+            $result_institutos = $busqueda->obtenerInstitutos();
+            $materias = [];
 
-$materias = [];
+            // selección de instituto
+            if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
+                $id_instituto = $_POST['id_instituto'];
 
-if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
-    $id_instituto = $_POST['id_instituto'];
-
-    // materias del instituto
-    $stmt_materias = $conn->prepare("SELECT id_materia, nombre_materia FROM materias WHERE id_instituto = :id_instituto");
-    $stmt_materias->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
-    $stmt_materias->execute();
-    $materias = $stmt_materias->fetchAll(PDO::FETCH_ASSOC);
-}
-?>
-
-<form method="post" action="">
-    <label for="id_instituto">Seleccionar Instituto:</label>
-    <select name="id_instituto" id="id_instituto" required>
-        <option value="">Seleccionar Instituto</option>
-        <?php
-        if (!empty($result_institutos)) {
-            foreach ($result_institutos as $row_instituto) {
-                $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
-                echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
+                // materias del instituto
+                $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
             }
-        } else {
-            echo "<option value=''>No hay institutos disponibles</option>";
-        }
+
+            // selección de materia
+            if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
+                $id_materia = $_POST['id_materia'];
+            }
         ?>
-    </select>
-    <input type="submit" value="Seleccionar Instituto">
-</form>
 
-<?php if (!empty($materias)): ?>
-    <form method="post" action="">
-        <label for="id_materia">Seleccionar Materia:</label>
-        <select name="id_materia" id="id_materia">
-            <option value="">Seleccionar Materia</option>
-            <?php
-            foreach ($materias as $materia) {
-                $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
-                echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
-            }
-            ?>
-        </select>
-        <input type="hidden" name="id_instituto" value="<?php echo $id_instituto; ?>">
-        <input type="submit" value="Seleccionar Materia">
-    </form>
-<?php endif; ?>
-
-<?php 
-if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
-    $id_materia = $_POST['id_materia'];
-
-    // alumnos de la materia
-    $stmt_alumnos = $conn->prepare("SELECT id_alumno, apellido_alumno, nombre_alumno FROM alumno WHERE id_materia = :id_materia");
-    $stmt_alumnos->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-    $stmt_alumnos->execute();
-    $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
-
-    function calcularPorcentajeAsistencia($id_alumno, $id_materia, $conn) {
-        // contador asistencias alumno
-        $query_asistencias = "SELECT COUNT(*) AS total_asistencias FROM asistencias WHERE id_alumno = :id_alumno AND id_materia = :id_materia";
-        $stmt_asistencias = $conn->prepare($query_asistencias);
-        $stmt_asistencias->bindParam(':id_alumno', $id_alumno, PDO::PARAM_INT);
-        $stmt_asistencias->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-        $stmt_asistencias->execute();
-        $asistencias = $stmt_asistencias->fetch(PDO::FETCH_ASSOC)['total_asistencias'];
-        
-        // contador asistencias total
-        $query_total_clases = "SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia";
-        $stmt_total_clases = $conn->prepare($query_total_clases);
-        $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-        $stmt_total_clases->execute();
-        $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
-
-        // porcentaje de asistencia    
-        return ($total_clases > 0) ? round(($asistencias / $total_clases) * 100) : 0;
-    }
-
-    function calcularCondicionCalificacion($calificacion, $parametros) {
-        if ($calificacion['parcial1'] >= $parametros['promocion'] && $calificacion['parcial2'] >= $parametros['promocion']) {
-            return "Promoción";
-        } elseif ($calificacion['parcial1'] >= $parametros['regular'] || $calificacion['parcial2'] >= $parametros['regular']) {
-            return "Regular";
-        } else {
-            return "Libre";
-        }
-    }
-
-    // tabla
-    if (!empty($alumnos)): 
-        // total de clases
-        $stmt_total_clases = $conn->prepare("SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia");
-        $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-        $stmt_total_clases->execute();
-        $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
-    ?>
         <form method="post" action="">
-            <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
-            <h2>Alumnos Inscriptos</h2>
-            <h4>Cantidad de Clases:  <?php echo $total_clases; ?></h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Apellido y Nombre</th>
-                        <th>Asistencia (%)</th>
-                        <th>Calificaciones</th>
-                        <th>Asistencias</th>
-                        <th>Calificaciones</th>
-                        <th>Final</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($alumnos as $alumno): ?>
-                        <tr>
-                            <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
-                            <td><?php echo calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn); ?>%</td>
-                            <td>
-                                <?php
-                                // calificaciones
-                                $stmt_calificaciones = $conn->prepare("SELECT parcial1, parcial2, final FROM calificaciones WHERE id_alumno = :id_alumno AND id_materia = :id_materia");
-                                $stmt_calificaciones->bindParam(':id_alumno', $alumno['id_alumno'], PDO::PARAM_INT);
-                                $stmt_calificaciones->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-                                $stmt_calificaciones->execute();
-                                $calificacion = $stmt_calificaciones->fetch(PDO::FETCH_ASSOC);
-                                echo !empty($calificacion) ? $calificacion['parcial1'] . " - " . $calificacion['parcial2'] : "No hay calificaciones";
-                                ?>
-                            </td>
-                            <td>
-                                <?php
-                                // condición asistencias
-                                $porcentaje_asistencia = calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn);
-                                $stmt_parametros = $conn->prepare("SELECT * FROM parametros WHERE id_instituto = :id_instituto");
-                                $stmt_parametros->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
-                                $stmt_parametros->execute();
-                                $parametros = $stmt_parametros->fetch(PDO::FETCH_ASSOC);
+            <label for="id_instituto">Seleccionar Instituto:</label>
+            <select name="id_instituto" id="id_instituto" onchange="this.form.submit()" required>
+                <option value="">Seleccionar Instituto</option>
+                <?php
+                if (!empty($result_institutos)) {
+                    foreach ($result_institutos as $row_instituto) {
+                        $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
+                        echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
+                    }
+                } else {
+                    echo "<option value=''>No hay institutos disponibles</option>";
+                }
+                ?>
+            </select>
 
-                                if ($porcentaje_asistencia >= $parametros['asistencias_promocion']) {
-                                    echo "Promoción";
-                                } elseif ($porcentaje_asistencia >= $parametros['asistencias_regular']) {
-                                    echo "Regular";
-                                } else {
-                                    echo "Libre";
-                                }
-                                ?>
-                            </td>
-                            <td>
-                                <?php
-                                // condición calificaciones
-                                if (!empty($calificacion)) {
-                                    echo calcularCondicionCalificacion($calificacion, $parametros);
-                                } else {
-                                    echo "No hay calificaciones";
-                                }
-                                ?>
-                            </td>
-                            <td>
-                                <?php
-                                // mostrar condicion del final
-                                $stmt_parametros = $conn->prepare("SELECT * FROM parametros WHERE id_instituto = :id_instituto");
-                                $stmt_parametros->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
-                                $stmt_parametros->execute();
-                                $parametros = $stmt_parametros->fetch(PDO::FETCH_ASSOC);
+            <?php if (!empty($materias)): ?>
+                <label for="id_materia">Seleccionar Materia:</label>
+                <select name="id_materia" id="id_materia" onchange="this.form.submit()">
+                    <option value="">Seleccionar Materia</option>
+                    <?php
+                    foreach ($materias as $materia) {
+                        $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
+                        echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
+                    }
+                    ?>
+                </select>
+                <input type="hidden" name="id_instituto" value="<?php echo $id_instituto; ?>">
+            <?php endif; ?>
+        </form>
 
-                                if ($calificacion['final'] >= $parametros['regular']) {
-                                    echo "Aprobado" . " - " . $calificacion['final'];
-                                } else {
-                                    echo "Desaprobado" . " - " . $calificacion['final'];
-                                }
-                                
-                                //  notas del final
-                                /* 
-                                if (!empty($calificacion)) {
-                                    echo $calificacion['final'];
-                                } else {
-                                    echo "No hay calificaciones";
-                                }*/
+        <?php 
+        if (isset($id_materia)):  
+            // Aquí puedes agregar el resto del código que maneja la lista de alumnos y su tabla.
+        ?>
 
-                                ?>
-                            </td>
-                                <td>
-                                    <button type="button" onclick="darBaja(<?php echo $alumno['id_alumno']; ?>)">-</button>
-                                </td>
+        <?php
+            // alumnos de la materia
+            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
+
+            function calcularPorcentajeAsistencia($id_alumno, $id_materia, $conn) {
+                // contador asistencias alumno
+                $query_asistencias = "SELECT COUNT(*) AS total_asistencias FROM asistencias WHERE id_alumno = :id_alumno AND id_materia = :id_materia";
+                $stmt_asistencias = $conn->prepare($query_asistencias);
+                $stmt_asistencias->bindParam(':id_alumno', $id_alumno, PDO::PARAM_INT);
+                $stmt_asistencias->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
+                $stmt_asistencias->execute();
+                $asistencias = $stmt_asistencias->fetch(PDO::FETCH_ASSOC)['total_asistencias'];
+                
+                // contador asistencias total
+                $query_total_clases = "SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia";
+                $stmt_total_clases = $conn->prepare($query_total_clases);
+                $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
+                $stmt_total_clases->execute();
+                $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
+
+                // porcentaje de asistencia    
+                return ($total_clases > 0) ? round(($asistencias / $total_clases) * 100) : 0;
+            }
+
+            function calcularCondicionCalificacion($calificacion, $parametros) {
+                if ($calificacion['parcial1'] >= $parametros['promocion'] && $calificacion['parcial2'] >= $parametros['promocion']) {
+                    return "Promoción";
+                } elseif ($calificacion['parcial1'] >= $parametros['regular'] || $calificacion['parcial2'] >= $parametros['regular']) {
+                    return "Regular";
+                } else {
+                    return "Libre";
+                }
+            }
+
+            // tabla
+            if (!empty($alumnos)): 
+                // total de clases
+                $stmt_total_clases = $conn->prepare("SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia");
+                $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
+                $stmt_total_clases->execute();
+                $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
+            ?>
+                <form method="post" action="">
+                    <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
+                    <h2>Alumnos Inscriptos</h2>
+                    <h4>Cantidad de Clases:  <?php echo $total_clases; ?></h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Apellido y Nombre</th>
+                                <th>Asistencia (%)</th>
+                                <th>Calificaciones</th>
+                                <th>Condición</th>
+                                <th>Acciones</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </form>
-        <?php else: ?>
-            <p>No hay alumnos registrados para esta materia.</p>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($alumnos as $alumno): ?>
+                                <tr>
+                                    <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
+                                    <td><?php echo calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn); ?>%</td>
+                                    <td>
+                                        <?php
+                                        // calificaciones
+                                        $stmt_calificaciones = $conn->prepare("SELECT parcial1, parcial2, final FROM calificaciones WHERE id_alumno = :id_alumno AND id_materia = :id_materia");
+                                        $stmt_calificaciones->bindParam(':id_alumno', $alumno['id_alumno'], PDO::PARAM_INT);
+                                        $stmt_calificaciones->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
+                                        $stmt_calificaciones->execute();
+                                        $calificacion = $stmt_calificaciones->fetch(PDO::FETCH_ASSOC);
+                                        echo !empty($calificacion) ? $calificacion['parcial1'] . " - " . $calificacion['parcial2']  . " - " . $calificacion['final'] : "No hay calificaciones";
+                                        ?>
+                                    </td>
+                                    <td>
+                                    <?php
+                                        // porcentaje de asistencia
+                                        $porcentaje_asistencia = calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn);
+
+                                        // parámetros de evaluación
+                                        $stmt_parametros = $conn->prepare("SELECT * FROM parametros WHERE id_instituto = :id_instituto");
+                                        $stmt_parametros->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
+                                        $stmt_parametros->execute();
+                                        $parametros = $stmt_parametros->fetch(PDO::FETCH_ASSOC);
+
+                                        // verificación parámetros
+                                        if ($parametros === false) {
+                                            echo "Error al obtener los parámetros de evaluación.";
+                                        }
+
+                                        // condición de asistencia
+                                        $condicion_asistencia = '';
+                                        if ($porcentaje_asistencia >= $parametros['asistencias_promocion']) {
+                                            $condicion_asistencia = "Promoción";
+                                        } elseif ($porcentaje_asistencia >= $parametros['asistencias_regular']) {
+                                            $condicion_asistencia = "Regular";
+                                        } else {
+                                            $condicion_asistencia = "Libre";
+                                        }
+
+                                        // condición de calificaciones
+                                        $condicion_calificacion = '';
+                                        if (!empty($calificacion)) {
+                                            $condicion_calificacion = calcularCondicionCalificacion($calificacion, $parametros);
+                                        } else {
+                                            $condicion_calificacion = "No hay calificaciones";
+                                        }
+
+                                        // ambas condiciones
+                                        if ($condicion_calificacion === "No hay calificaciones") {
+                                            echo "No hay calificaciones para evaluar la condición";
+                                        } else {
+                                            if ($condicion_asistencia === "Promoción" && $condicion_calificacion === "Promoción") {
+                                                echo "Promoción";
+                                            } elseif ($condicion_asistencia === "Regular" && ($condicion_calificacion === "Regular" || $condicion_calificacion === "Promoción")) {
+                                                echo "Regular";
+                                            } else {
+                                                echo "Libre";
+                                            }
+                                        }
+                                    ?>
+                                    </td>
+                                    <td>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
+                                            <input type="hidden" name="id_alumno" value="<?php echo $alumno['id_alumno']; ?>">
+                                            <button type="submit" name="eliminar_alumno" value="1">Eliminar Alumno</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </form>
+            <?php else: ?>
+                <p>No hay alumnos registrados en esta materia.</p>
+            <?php endif; ?>
         <?php endif; ?>
-
-        
-
-    <?php } ?>
-
     </body>
     <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

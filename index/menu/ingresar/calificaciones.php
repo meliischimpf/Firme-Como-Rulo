@@ -41,11 +41,11 @@
         </svg>
         Seguimiento
        </a>
-       <a class="sidebar-link" href="#">
+       <a class="sidebar-link" href="../../menu/ingresar/listado_alumnos.php">
         <svg viewBox="0 0 24 24" fill="currentColor">
          <path fill-rule="evenodd" clip-rule="evenodd" d="M17.769 8.382H22C22 4.985 19.964 3 16.516 3H7.484C4.036 3 2 4.985 2 8.338v7.324C2 19.015 4.036 21 7.484 21h9.032C19.964 21 22 19.015 22 15.662v-.313h-4.231c-1.964 0-3.556-1.552-3.556-3.466 0-1.915 1.592-3.467 3.556-3.467v-.034zm0 1.49h3.484c.413 0 .747.326.747.728v2.531a.746.746 0 01-.747.728H17.85c-.994.013-1.864-.65-2.089-1.595a1.982 1.982 0 01.433-1.652 2.091 2.091 0 011.576-.74zm.151 2.661h.329a.755.755 0 00.764-.745.755.755 0 00-.764-.746h-.329a.766.766 0 00-.54.213.727.727 0 00-.224.524c0 .413.34.75.764.754zM6.738 8.382h5.644a.755.755 0 00.765-.746.755.755 0 00-.765-.745H6.738a.755.755 0 00-.765.737c0 .413.341.75.765.754z" />
         </svg>
-        -
+        Listado Alumnos
        </a>
       </div>
      </div>
@@ -83,98 +83,76 @@
      <div class="main-container">
       <h2>Calificaciones</h2>
 
-        <?php
+      <?php
         require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
+        
         $db = new Database();
         $conn = $db->connect();
-
+        $busqueda = new Busqueda($conn);
+        
         // institutos
-        $stmt_institutos = $conn->prepare("SELECT id_instituto, nombre_instituto FROM instituto");
-        $stmt_institutos->execute();
-        $result_institutos = $stmt_institutos->fetchAll(PDO::FETCH_ASSOC);
-
+        $result_institutos = $busqueda->obtenerInstitutos();
         $materias = [];
+        $alumnos = [];
 
+        // selección instituto
         if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
             $id_instituto = $_POST['id_instituto'];
-
-            // materias según el instituto
-            $stmt_materias = $conn->prepare("SELECT id_materia, nombre_materia FROM materias WHERE id_instituto = :id_instituto");
-            $stmt_materias->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
-            $stmt_materias->execute();
-            $materias = $stmt_materias->fetchAll(PDO::FETCH_ASSOC);
+            // materias según instituto
+            $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
         }
-        ?>
 
+        // selección materia
+        if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
+            $id_materia = $_POST['id_materia'];
+            // Obtener¿alumnos según la materia seleccionada
+            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
+        }
+    ?>
+
+    <form method="post" action="">
+        <label for="id_instituto">Seleccionar Instituto:</label>
+        <select name="id_instituto" id="id_instituto" onchange="this.form.submit()" required>
+            <option value="">Seleccionar Instituto</option>
+
+            <?php
+            if (!empty($result_institutos)) {
+                foreach ($result_institutos as $row_instituto) {
+                    $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
+                    echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
+                }
+            } else {
+                echo "<option value=''>No hay institutos disponibles</option>";
+            }
+            ?>
+        </select>
+    
+
+    <?php if (!empty($materias)): ?>
         <form method="post" action="">
-            <label for="id_instituto">Seleccionar Instituto:</label>
-            <select name="id_instituto" id="id_instituto" required>
-                <option value="">Seleccionar Instituto</option>
+            <label for="id_materia">Seleccionar Materia:</label>
+            <select name="id_materia" id="id_materia" onchange="this.form.submit()">
+                <option value="">Seleccionar Materia</option>
 
                 <?php
-                if (!empty($result_institutos)) {
-                    foreach ($result_institutos as $row_instituto) {
-                        $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
-                        echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
-                    }
-                } else {
-                    echo "<option value=''>No hay institutos disponibles</option>";
+                foreach ($materias as $materia) {
+                    $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
+                    echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
                 }
                 ?>
             </select>
-            <input type="submit" value="Seleccionar Instituto">
+            <input type="hidden" name="id_instituto" value="<?php echo $id_instituto; ?>">
         </form>
+    <?php endif; ?>
 
-        <?php if (!empty($materias)): ?>
-            <form method="post" action="">
-                <label for="id_materia">Seleccionar Materia:</label>
-                <select name="id_materia" id="id_materia">
-                    <option value="">Seleccionar Materia</option>
-
-                    <?php
-                    foreach ($materias as $materia) {
-                        $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
-                        echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
-                    }
-                    ?>
-                </select>
-
-                <input type="hidden" name="id_instituto" value="<?php echo $id_instituto; ?>">
-                <input type="submit" value="Seleccionar Materia">
-            </form>
-        <?php endif; ?>
-
-        <?php if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])): ?>
-            <?php
-            $id_materia = $_POST['id_materia'];
-
-            // alumnos según la materia seleccionada
-            $stmt_alumnos = $conn->prepare("SELECT id_alumno, apellido_alumno, nombre_alumno FROM alumno WHERE id_materia = :id_materia");
-            $stmt_alumnos->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-            $stmt_alumnos->execute();
-            $alumnos = $stmt_alumnos->fetchAll(PDO::FETCH_ASSOC);
-
-            // calificaciones
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                if (isset($_POST['notas'])) {
-                    foreach ($_POST['notas'] as $id_alumno => $notas) {
-                        $nota1 = $notas['nota1'];
-                        $nota2 = $notas['nota2'];
-                        $nota_final = $notas['nota_final'];
-                        Alumno::gestionarNotas($id_alumno, $id_materia, $nota1, $nota2, $nota_final);
-                    }
-                }
-            }
-            ?>
-
-            <?php if (!empty($alumnos)): ?>
-                <form method="post" action="">
-                    <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
-                    <h4>Ingresar Notas</h4>
-                    <table>
-                    <thead>
+    <?php if (isset($id_materia) && !empty($alumnos)): ?>
+        <form method="post" action="">
+            <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
+            <h4>Ingresar Notas</h4>
+            <table>
+                <thead>
                     <tr>
                         <th>Apellido y Nombre</th>
                         <th>Parcial 1</th>
@@ -189,18 +167,18 @@
                             <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota1]" value=""></td>
                             <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota2]" value=""></td>
                             <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota_final]" value=""></td>
-                         <?php endforeach; ?>
-                    </tr>
-                    <input type="submit" value="Guardar Notas">
-                </form>
-            <?php else: ?>
-                <p>No hay alumnos registrados para esta materia.</p>
-            <?php endif; ?>
-        <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            <input type="submit" value="Guardar Notas">
+        </form>
+    <?php elseif (isset($id_materia) && empty($alumnos)): ?>
+        <p>No hay alumnos registrados para esta materia.</p>
+<?php endif; ?>
 
-    
-            </div>
-
+        
+    </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
 <script src="../../resources/menu/sidebar.js"></script>
