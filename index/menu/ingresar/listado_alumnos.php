@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.css" />
     <link rel="stylesheet" href="../../resources/menu/sidebar.css">
     <link rel="stylesheet" href="../../resources/menu/menu.css">
+    <link rel="icon" href="../../resources/img/favicon.ico" type="image/x-icon">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -97,8 +98,6 @@
     // institutos
     $result_institutos = $busqueda->obtenerInstitutos();
     $materias = [];
-    $id_alumno_asistencia = []; // almacena IDs de alumnos con asistencia para la fecha seleccionada
-    $fecha_asistencia = date('Y-m-d'); // fecha actual como fecha predeterminada
 
     // selección de instituto
     if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
@@ -110,12 +109,6 @@
     if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
         $id_materia = $_POST['id_materia'];
         $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
-    }
-
-    // asistencia para una fecha seleccionada
-    if (isset($_POST['fecha_asistencia']) && !empty($_POST['fecha_asistencia']) && isset($id_materia)) {
-        $fecha_asistencia = $_POST['fecha_asistencia']; 
-        $id_alumno_asistencia = Alumno::obtenerAsistenciaPorFecha($id_materia, $fecha_asistencia);
     }
     ?>
 
