@@ -80,7 +80,15 @@
     </div>
 
      <div class="main-container">
+      <h2>Menu Principal</h2>
 
+     Bienvenido (nombre Profesor)
+     <p>cargar base de datos<button>cargar</button></p>
+
+    Datos:
+    Alumnos Inscriptos
+    Materias 
+    Institutos 
 
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
