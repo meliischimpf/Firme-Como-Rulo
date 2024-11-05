@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.css" />
     <link rel="stylesheet" href="../../resources/menu/sidebar.css">
     <link rel="stylesheet" href="../../resources/menu/menu.css">
+    <link rel="icon" href="../../resources/img/favicon.ico" type="image/x-icon">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -86,101 +87,100 @@
         <a href="../registros/registrar_alumno.php"><button value="anadir alumno"> + Alumno</button></a>
     </div>
     <?php
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
 
-    $db = new Database();
-    $conn = $db->connect();
-    $busqueda = new Busqueda($conn);
+        $db = new Database();
+        $conn = $db->connect();
+        $busqueda = new Busqueda($conn);
 
-    // institutos
-    $result_institutos = $busqueda->obtenerInstitutos();
-    $materias = [];
-    $id_alumno_asistencia = []; // almacena IDs de alumnos con asistencia para la fecha seleccionada
-    $fecha_asistencia = date('Y-m-d'); // fecha actual como fecha predeterminada
+        // institutos
+        $result_institutos = $busqueda->obtenerInstitutos();
+        $materias = [];
+        $id_alumno_asistencia = []; // almacena IDs de alumnos con asistencia para la fecha seleccionada
+        $fecha_asistencia = date('Y-m-d'); // fecha actual como fecha predeterminada
 
-    // selección de instituto
-    if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
-        $id_instituto = $_POST['id_instituto'];
-        $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
-    }
+        // selección de instituto
+        if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
+            $id_instituto = $_POST['id_instituto'];
+            $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
+        }
 
-    // selección de materia
-    if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
-        $id_materia = $_POST['id_materia'];
-        $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
-    }
+        // selección de materia
+        if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
+            $id_materia = $_POST['id_materia'];
+            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
+        }
 
-    // asistencia para una fecha seleccionada
-    if (isset($_POST['fecha_asistencia']) && !empty($_POST['fecha_asistencia']) && isset($id_materia)) {
-        $fecha_asistencia = $_POST['fecha_asistencia']; 
-        $id_alumno_asistencia = Alumno::obtenerAsistenciaPorFecha($id_materia, $fecha_asistencia);
-    }
-    ?>
+        // asistencia para una fecha seleccionada
+        if (isset($_POST['fecha_asistencia']) && !empty($_POST['fecha_asistencia']) && isset($id_materia)) {
+            $fecha_asistencia = $_POST['fecha_asistencia']; 
+            $id_alumno_asistencia = Alumno::obtenerAsistenciaPorFecha($id_materia, $fecha_asistencia);
+        }
+        ?>
 
-    <form method="post" action="">
-        <label for="id_instituto">Seleccionar Instituto:</label>
-        <select name="id_instituto" id="id_instituto" required onchange="this.form.submit()">
-            <option value="">Seleccionar Instituto</option>
-            <?php
-            if (!empty($result_institutos)) {
-                foreach ($result_institutos as $row_instituto) {
-                    $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
-                    echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
-                }
-            } else {
-                echo "<option value=''>No hay institutos disponibles</option>";
-            }
-            ?>
-        </select>
-
-        <?php if (!empty($materias)): ?>
-            <label for="id_materia">Seleccionar Materia:</label>
-            <select name="id_materia" id="id_materia" onchange="this.form.submit()">
-                <option value="">Seleccionar Materia</option>
+        <form method="post" action="">
+            <label for="id_instituto">Seleccionar Instituto:</label>
+            <select name="id_instituto" id="id_instituto" required onchange="this.form.submit()">
+                <option value="">Seleccionar Instituto</option>
                 <?php
-                foreach ($materias as $materia) {
-                    $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
-                    echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
+                if (!empty($result_institutos)) {
+                    foreach ($result_institutos as $row_instituto) {
+                        $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
+                        echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
+                    }
+                } else {
+                    echo "<option value=''>No hay institutos disponibles</option>";
                 }
                 ?>
             </select>
-            <input type="hidden" name="id_instituto" value="<?php echo isset($id_instituto) ? $id_instituto : ''; ?>">
-        <?php endif; ?>
 
-        <?php if (isset($id_materia) && !empty($alumnos)): ?>
-            <label for="fecha_asistencia">Seleccionar Fecha de Asistencia: </label>
-            <input type="date" name="fecha_asistencia" id="fecha_asistencia" value="<?php echo htmlspecialchars($fecha_asistencia); ?>" onchange="this.form.submit()">
-            <h4>Alumnos Inscriptos</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Apellido y Nombre</th>
-                        <th>Presente</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($alumnos as $alumno): ?>
+            <?php if (!empty($materias)): ?>
+                <label for="id_materia">Seleccionar Materia:</label>
+                <select name="id_materia" id="id_materia" onchange="this.form.submit()">
+                    <option value="">Seleccionar Materia</option>
+                    <?php
+                    foreach ($materias as $materia) {
+                        $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
+                        echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
+                    }
+                    ?>
+                </select>
+                <input type="hidden" name="id_instituto" value="<?php echo isset($id_instituto) ? $id_instituto : ''; ?>">
+            <?php endif; ?>
+
+            <?php if (isset($id_materia) && !empty($alumnos)): ?>
+                <label for="fecha_asistencia">Seleccionar Fecha de Asistencia: </label>
+                <input type="date" name="fecha_asistencia" id="fecha_asistencia" value="<?php echo htmlspecialchars($fecha_asistencia); ?>" onchange="this.form.submit()">
+                <h4>Alumnos Inscriptos</h4>
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
-                            <td>
-                                <input type="checkbox" name="asistencia[<?php echo $alumno['id_alumno']; ?>]" value="1"
-                                    onchange="registrarAsistencia(<?php echo $alumno['id_alumno']; ?>, <?php echo $id_materia; ?>, this.checked)"
-                                    <?php echo in_array($alumno['id_alumno'], $id_alumno_asistencia) ? 'checked' : ''; ?>>
-                            </td>
+                            <th>Apellido y Nombre</th>
+                            <th>Presente</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php elseif (isset($id_materia)): ?>
-            <p>No hay alumnos registrados para esta materia.</p>
-        <?php endif; ?>
-    </form>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alumnos as $alumno): ?>
+                            <tr>
+                                <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
+                                <td>
+                                    <input type="checkbox" name="asistencia[<?php echo $alumno['id_alumno']; ?>]" value="1"
+                                        onchange="registrarAsistencia(<?php echo $alumno['id_alumno']; ?>, <?php echo $id_materia; ?>, this.checked)"
+                                        <?php echo in_array($alumno['id_alumno'], $id_alumno_asistencia) ? 'checked' : ''; ?>>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php elseif (isset($id_materia)): ?>
+                <p>No hay alumnos registrados para esta materia.</p>
+            <?php endif; ?>
+        </form>
 </form>
 
     </div>
-
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
 <script src="../../resources/menu/sidebar.js"></script>

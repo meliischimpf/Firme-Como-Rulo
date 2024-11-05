@@ -271,7 +271,7 @@
                                         <form action="" method="post">
                                             <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
                                             <input type="hidden" name="id_alumno" value="<?php echo $alumno['id_alumno']; ?>">
-                                            <button type="submit" name="eliminar_alumno" value="1">Eliminar Alumno</button>
+                                            <button type="button" onclick="darBaja(<?php echo $alumno['id_alumno']; ?>)">Eliminar Alumno</button>
                                         </form>
                                     </td>
                                 </tr>
