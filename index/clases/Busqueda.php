@@ -23,7 +23,7 @@ class Busqueda {
     }
 
     public function obtenerAlumnosPorMateria($id_materia) {
-        $stmt = $this->conn->prepare("SELECT id_alumno, apellido_alumno, nombre_alumno FROM alumno WHERE id_materia = :id_materia");
+        $stmt = $this->conn->prepare("SELECT id_alumno, apellido_alumno, nombre_alumno, mail_alumno, fecha_nacimiento_alumno, dni_alumno FROM alumno WHERE id_materia = :id_materia");
         $stmt->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
