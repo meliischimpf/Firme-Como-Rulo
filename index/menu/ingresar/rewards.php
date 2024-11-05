@@ -3,9 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Firme como Rulo</title>
+    <style>
+        /* Ocultar el checkbox, pero mantener la funcionalidad */
+        .labelcheck {
+            display: none; /* Oculta el checkbox real */
+        }
+
+        /* Estilo para el label que funcionará como estrella */
+        .labelcheck + label {
+            font-size: 30px; /* Tamaño de la estrella */
+            color: gray; /* Color inicial de la estrella */
+            cursor: pointer; /* Cambia el cursor al pasar sobre la estrella */
+            display: inline-block; /* Para asegurarse de que el label se comporte correctamente */
+        }
+
+        /* Estilo para la estrella cuando está marcada */
+        .labelcheck:checked + label {
+            color: gold; /* Cambia el color a dorado al marcar */
+        }
+
+        /* Estrella vacía usando pseudo-elemento */
+        .labelcheck + label::before {
+            content: '★'; /* Agrega la estrella */
+            font-size: 30px; /* Tamaño de la estrella */
+        }
+    </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.css" />
     <link rel="stylesheet" href="../../resources/menu/sidebar.css">
     <link rel="stylesheet" href="../../resources/menu/menu.css">
+    <link rel="icon" href="../../resources/img/favicon.ico" type="image/x-icon">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -85,15 +111,90 @@
     <div class="anadir">
         <a href="../registros/registrar_alumno.php"><button value="anadir alumno"> + Alumno</button></a>
     </div>
+    <?php
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
 
+        $db = new Database();
+        $conn = $db->connect();
+        $busqueda = new Busqueda($conn);
 
-    
-    </div>
+        // institutos
+        $result_institutos = $busqueda->obtenerInstitutos();
+        $materias = [];
 
+        // selección de instituto
+        if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
+            $id_instituto = $_POST['id_instituto'];
+            $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
+        }
+
+        // selección de materia
+        if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
+            $id_materia = $_POST['id_materia'];
+            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
+        }
+        ?>
+
+        <form method="post" action="">
+            <label for="id_instituto">Seleccionar Instituto:</label>
+            <select name="id_instituto" id="id_instituto" required onchange="this.form.submit()">
+                <option value="">Seleccionar Instituto</option>
+                <?php
+                if (!empty($result_institutos)) {
+                    foreach ($result_institutos as $row_instituto) {
+                        $selected = (isset($id_instituto) && $id_instituto == $row_instituto["id_instituto"]) ? 'selected' : '';
+                        echo "<option value='" . $row_instituto["id_instituto"] . "' $selected>" . $row_instituto["nombre_instituto"] . "</option>";
+                    }
+                } else {
+                    echo "<option value=''>No hay institutos disponibles</option>";
+                }
+                ?>
+            </select>
+
+            <?php if (!empty($materias)): ?>
+                <label for="id_materia">Seleccionar Materia:</label>
+                <select name="id_materia" id="id_materia" onchange="this.form.submit()">
+                    <option value="">Seleccionar Materia</option>
+                    <?php
+                    foreach ($materias as $materia) {
+                        $selected = (isset($id_materia) && $id_materia == $materia["id_materia"]) ? 'selected' : '';
+                        echo "<option value='" . $materia['id_materia'] . "' $selected>" . $materia['nombre_materia'] . "</option>";
+                    }
+                    ?>
+                </select>
+                <input type="hidden" name="id_instituto" value="<?php echo isset($id_instituto) ? $id_instituto : ''; ?>">
+            <?php endif; ?>
+
+            <?php if (isset($id_materia) && !empty($alumnos)): ?>
+                <h4>Alumnos Inscriptos</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Apellido y Nombre</th>
+                            <th>Rewards</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alumnos as $index => $alumno): ?>
+                            <tr>
+                                <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
+                                <td>
+                                    <input type="checkbox" class="labelcheck" id="reward<?php echo $index; ?>" />
+                                    <label for="reward<?php echo $index; ?>"></label>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php elseif (isset($id_materia)): ?>
+                <p>No hay alumnos registrados para esta materia.</p>
+            <?php endif; ?>
+        </form>
+    </form>
+</div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
 <script src="../../resources/menu/sidebar.js"></script>
-<script src="../../resources/menu/asistencia_fecha.js"></script>
-
-
 </html>
