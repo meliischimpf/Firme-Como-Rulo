@@ -1,3 +1,16 @@
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Materia.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Instituto.php';
+
+$db = new Database();
+$conn = $db->connect();
+$institutos = [];
+$id_instituto = null; 
+$institutos = $instituto->obtenerInstitutos();
+    
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,7 +23,7 @@
 </head>
 
 <body>
-    <form action="main.php" method="post">
+    <form action="procesar_registros/procesar_registro_materia.php" method="post">
         <h2>Registro de Materia</h2>
 
         <div class="form-group">
@@ -19,8 +32,17 @@
                 <input type="text" id="nombre" name="nombre" required>
             </div>
             <div class="half-width">
-                <label for="instituto"><b>Instituto</b></label>
-                <select name="materia" id=""></select>
+                <label for="instituto"><b>instituto</b></label>
+                <select name="instituto" id="instituto" required>
+                    <option value="">Seleccione un instituto</option>
+                    <?php
+                        if (!empty($institutos)) {
+                            foreach ($institutos as $instituto) {
+                                echo "<option value='" . $instituto['id_instituto'] . "'>" . $instituto['nombre_instituto'] . "</option>";
+                            }
+                        }
+                    ?>
+                </select>
             </div>
         </div>
 

@@ -286,10 +286,13 @@
             <i>Password</i>
           </div>
           <div class="links">
-            <a href="#">Registrarse</a>
+            <a href="index/menu/registrar/registrar_usuario.php">Registrarse</a>
           </div>
           <div class="inputBox">
             <input type="submit" value="Login"></input>
+        </form>
+        <form action="index/menu/importar_base_de_datos.php" method="POST">
+          <button type="submit" class="btn btn-primary" style= "background-color: grey;">Importar Base de Datos</button>
         </form>
           </div>
         </div>

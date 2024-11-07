@@ -10,19 +10,8 @@
 </head>
 
 <body>
-    <form action="index.php" method="post">
+    <form action="procesar_registros/procesar_registro_usuario.php" method="post">
         <h2>Registro Usuario</h2>
-
-        <div class="form-group">
-            <div class="half-width">
-                <label for="mail"><b>Mail</b></label>
-                <input type="text" id="mail" name="mail" required>
-            </div>
-            <div class="half-width">
-                <label for="password"><b>Contraseña</b></label>
-                <input type="text" id="password" name="password" required>
-            </div>
-        </div>
 
         <div class="form-group">
             <div class="half-width">
@@ -35,15 +24,17 @@
             </div>
         </div>
 
-        <div class="checkbox-group">
-            <b><h4>Tipo de Usuario:</h4></b>
-            
-                <input type="radio" id="profesorRadio" name="userType" value="profesor">
-                <span>Profesor</span>
-                <input type="radio" id="alumnoRadio" name="userType" value="alumno">
-                <span>Alumno</span>
+        <div class="form-group">
+            <div class="half-width">
+                <label for="mail"><b>Mail</b></label>
+                <input type="text" id="mail" name="mail" required>
+            </div>
+            <div class="half-width">
+                <label for="password"><b>Contraseña</b></label>
+                <input type="text" id="password" name="password" required>
+            </div>
         </div>
-
+        
         <button type="submit"><b>Registrar</b></button>
 </body>
 </html>

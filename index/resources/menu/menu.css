@@ -1,3 +1,4 @@
+/* Estilos existentes */
 form label {
   font-size: 1em;
   color: #fff;
@@ -95,4 +96,64 @@ h4 {
   .home-content .text {
     font-size: 1.2em;
   }
+}
+
+/* Nuevos estilos para los contenedores y botones de editar y eliminar */
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Contenedor para cada sección de datos */
+.data-box {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+  color: #333;
+  font-size: 1.5em;
+}
+
+p, ul {
+  color: #666;
+  font-size: 1.1em;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+/* Estilo para los botones de editar y eliminar */
+.buttons {
+  margin-top: 10px;
+}
+
+.buttons button {
+  padding: 8px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+  background-color: #45a049;
+}
+
+.buttons button:active {
+  background-color: #3e8e41;
+}
+
+li {
+  margin-bottom: 10px;
 }

@@ -14,7 +14,7 @@
 <div class="container">
     <div class="sidebar">
      <span class="logo">S</span>
-     <a class="logo-expand" href="../menu.php">Firme Como Rulo</a>
+     <img src="../../resources/img/Logo Firme como Rulo.png" alt="logo"><a class="logo-expand" href="#">Firme Como Rulo</a></img>
      <div class="side-wrapper">
       <div class="side-title">MENU</div>
       <div class="side-menu">
@@ -71,7 +71,7 @@
         </svg>
         Nuevo Instituto
        </a>
-       <a class="sidebar-link" href="../registrar/parametros.php">
+       <a class="sidebar-link" href="../editar/parametros.php">
         <svg viewBox="0 0 24 24" fill="currentColor">
          <path fill-rule="evenodd" clip-rule="evenodd" d="M16.158 8.233a4.207 4.207 0 01-4.209 4.234 4.207 4.207 0 01-4.21-4.234A4.206 4.206 0 0111.95 4a4.206 4.206 0 014.21 4.233zM11.95 20c-3.431 0-6.36-.544-6.36-2.72 0-2.177 2.91-2.74 6.36-2.74 3.431 0 6.361.544 6.361 2.72S15.399 20 11.949 20zm6.008-11.69a5.765 5.765 0 01-.984 3.24.158.158 0 00.107.245 3.4 3.4 0 00.483.046c1.643.044 3.118-1.02 3.525-2.621.604-2.379-1.168-4.514-3.425-4.514-.245 0-.48.026-.708.073-.031.007-.064.021-.082.05-.022.034-.006.08.016.11a5.807 5.807 0 011.068 3.37zm2.721 5.203c1.104.217 1.83.66 2.131 1.304a1.923 1.923 0 010 1.67c-.46.998-1.944 1.319-2.52 1.402-.12.018-.215-.086-.203-.206.295-2.767-2.048-4.08-2.654-4.381-.026-.014-.032-.034-.03-.047.003-.009.013-.023.033-.026 1.312-.024 2.722.156 3.243.284zM6.438 11.84c.164-.004.325-.019.483-.046a.158.158 0 00.106-.245 5.765 5.765 0 01-.984-3.24c0-1.25.39-2.416 1.068-3.372.022-.03.037-.075.016-.11-.017-.027-.051-.042-.082-.05a3.52 3.52 0 00-.71-.072c-2.255 0-4.027 2.135-3.423 4.514.407 1.6 1.882 2.664 3.525 2.621zm.159 1.414c.003.013-.003.033-.028.047-.607.302-2.95 1.614-2.656 4.38.013.121-.082.224-.201.207-.577-.083-2.06-.404-2.52-1.402a1.917 1.917 0 010-1.67c.3-.644 1.026-1.087 2.13-1.305.522-.127 1.93-.307 3.244-.283.02.003.03.017.03.026z" />
         </svg>
@@ -87,31 +87,31 @@
       <?php
         require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
-        
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Materia.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Instituto.php';
+
         $db = new Database();
         $conn = $db->connect();
-        $busqueda = new Busqueda($conn);
         
-        // institutos
-        $result_institutos = $busqueda->obtenerInstitutos();
+        $result_institutos = $instituto->obtenerInstitutos();
         $materias = [];
         $alumnos = [];
+    
 
-        // selección instituto
+        // selección de instituto
         if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
             $id_instituto = $_POST['id_instituto'];
-            // materias según instituto
-            $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
+            $instituto = Instituto::crearInstitutoDesdeID($id_instituto);
+            $materias = $materia->obtenerMateriasPorInstituto($id_instituto);
         }
 
-        // selección materia
+        // selección de materia
         if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
             $id_materia = $_POST['id_materia'];
-            // obtener alumnos según la materia seleccionada
-            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
+            $materia = Materia::crearMateriaDesdeID($id_materia);
+            $alumnos = $materia->obtenerAlumnosPorMateria($id_materia);
         }
-    ?>
+        ?>
 
     <form method="post" action="">
         <label for="id_instituto">Seleccionar Instituto:</label>
@@ -147,6 +147,23 @@
             <input type="hidden" name="id_instituto" value="<?php echo $id_instituto; ?>">
         </form>
     <?php endif; ?>
+           
+    
+    <?php
+    // calificaciones
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (isset($_POST['notas'])) {
+            foreach ($_POST['notas'] as $id_alumno => $notas) {
+                $parcial1 = $notas['parcial1'];
+                $parcial2 = $notas['parcial2'];
+                $final = $notas['final'];
+                Alumno::gestionarNotas($id_alumno, $id_materia, $parcial1, $parcial2, $final);
+            }
+        }
+    }
+    ?>
+
+
 
     <?php if (isset($id_materia) && !empty($alumnos)): ?>
         <form method="post" action="">
@@ -165,9 +182,9 @@
                     <?php foreach ($alumnos as $alumno): ?>
                         <tr>
                             <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
-                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota1]" value=""></td>
-                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota2]" value=""></td>
-                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][nota_final]" value=""></td>
+                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][parcial1]" value=""></td>
+                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][parcial2]" value=""></td>
+                            <td><input type="text" name="notas[<?php echo $alumno['id_alumno']; ?>][final]" value=""></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

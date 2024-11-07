@@ -14,7 +14,7 @@
 <div class="container">
     <div class="sidebar">
      <span class="logo">S</span>
-     <a class="logo-expand" href="../menu.php">Firme Como Rulo</a>
+     <img src="../../resources/img/Logo Firme como Rulo.png" alt="logo"><a class="logo-expand" href="#">Firme Como Rulo</a></img>
      <div class="side-wrapper">
       <div class="side-title">MENU</div>
       <div class="side-menu">
@@ -71,7 +71,7 @@
         </svg>
         Nuevo Instituto
        </a>
-       <a class="sidebar-link" href="../registrar/parametros.php">
+       <a class="sidebar-link" href="../editar/parametros.php">
         <svg viewBox="0 0 24 24" fill="currentColor">
          <path fill-rule="evenodd" clip-rule="evenodd" d="M16.158 8.233a4.207 4.207 0 01-4.209 4.234 4.207 4.207 0 01-4.21-4.234A4.206 4.206 0 0111.95 4a4.206 4.206 0 014.21 4.233zM11.95 20c-3.431 0-6.36-.544-6.36-2.72 0-2.177 2.91-2.74 6.36-2.74 3.431 0 6.361.544 6.361 2.72S15.399 20 11.949 20zm6.008-11.69a5.765 5.765 0 01-.984 3.24.158.158 0 00.107.245 3.4 3.4 0 00.483.046c1.643.044 3.118-1.02 3.525-2.621.604-2.379-1.168-4.514-3.425-4.514-.245 0-.48.026-.708.073-.031.007-.064.021-.082.05-.022.034-.006.08.016.11a5.807 5.807 0 011.068 3.37zm2.721 5.203c1.104.217 1.83.66 2.131 1.304a1.923 1.923 0 010 1.67c-.46.998-1.944 1.319-2.52 1.402-.12.018-.215-.086-.203-.206.295-2.767-2.048-4.08-2.654-4.381-.026-.014-.032-.034-.03-.047.003-.009.013-.023.033-.026 1.312-.024 2.722.156 3.243.284zM6.438 11.84c.164-.004.325-.019.483-.046a.158.158 0 00.106-.245 5.765 5.765 0 01-.984-3.24c0-1.25.39-2.416 1.068-3.372.022-.03.037-.075.016-.11-.017-.027-.051-.042-.082-.05a3.52 3.52 0 00-.71-.072c-2.255 0-4.027 2.135-3.423 4.514.407 1.6 1.882 2.664 3.525 2.621zm.159 1.414c.003.013-.003.033-.028.047-.607.302-2.95 1.614-2.656 4.38.013.121-.082.224-.201.207-.577-.083-2.06-.404-2.52-1.402a1.917 1.917 0 010-1.67c.3-.644 1.026-1.087 2.13-1.305.522-.127 1.93-.307 3.244-.283.02.003.03.017.03.026z" />
         </svg>
@@ -84,32 +84,46 @@
      <div class="main-container">
       <h2>Seguimiento</h2>
       
-      <?php
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php'; 
+    <?php
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Materia.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Instituto.php';
 
-            $db = new Database();
-            $conn = $db->connect();
-            $busqueda = new Busqueda($conn);
+        $db = new Database();
+        $conn = $db->connect();
+        
+        $result_institutos = $instituto->obtenerInstitutos();
+        $materias = [];
+    
 
-            // institutos
-            $result_institutos = $busqueda->obtenerInstitutos();
-            $materias = [];
+        // selección de instituto
+        if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
+            $id_instituto = $_POST['id_instituto'];
+            $instituto = Instituto::crearInstitutoDesdeID($id_instituto);
+            $materias = $materia->obtenerMateriasPorInstituto($id_instituto);
+        }
 
-            // selección de instituto
-            if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
-                $id_instituto = $_POST['id_instituto'];
+        // selección de materia
+        if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
+            $id_materia = $_POST['id_materia'];
+            $materia = Materia::crearMateriaDesdeID($id_materia);
+            $alumnos_data = $materia->obtenerAlumnosPorMateria($id_materia);
 
-                // materias del instituto
-                $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
+
+            // cada alumno en una instancia de Alumno
+            foreach ($alumnos_data as $data) {
+                $alumnos[] = new Alumno(
+                    $data['apellido_alumno'],
+                    $data['nombre_alumno'],
+                    isset($data['dni']) ? $data['dni'] : null,
+                    isset($data['mail']) ? $data['mail'] : null,
+                    isset($data['fecha_nacimiento']) ? $data['fecha_nacimiento'] : null,
+                    isset($data['id_alumno']) ? $data['id_alumno'] : null 
+                );
             }
-
-            // selección de materia
-            if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
-                $id_materia = $_POST['id_materia'];
-            }
-        ?>
+        }
+    ?>
 
         <form method="post" action="">
             <label for="id_instituto">Seleccionar Instituto:</label>
@@ -142,61 +156,17 @@
             <?php endif; ?>
         </form>
 
-        <?php 
-        if (isset($id_materia)):  
-            // Aquí puedes agregar el resto del código que maneja la lista de alumnos y su tabla.
-        ?>
+        <?php if (isset($id_materia) && !empty($alumnos)): ?>
 
-        <?php
-            // alumnos de la materia
-            $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
-
-            function calcularPorcentajeAsistencia($id_alumno, $id_materia, $conn) {
-                // contador asistencias alumno
-                $query_asistencias = "SELECT COUNT(*) AS total_asistencias FROM asistencias WHERE id_alumno = :id_alumno AND id_materia = :id_materia";
-                $stmt_asistencias = $conn->prepare($query_asistencias);
-                $stmt_asistencias->bindParam(':id_alumno', $id_alumno, PDO::PARAM_INT);
-                $stmt_asistencias->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-                $stmt_asistencias->execute();
-                $asistencias = $stmt_asistencias->fetch(PDO::FETCH_ASSOC)['total_asistencias'];
-                
-                // contador asistencias total
-                $query_total_clases = "SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia";
-                $stmt_total_clases = $conn->prepare($query_total_clases);
-                $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-                $stmt_total_clases->execute();
-                $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
-
-                // porcentaje de asistencia    
-                return ($total_clases > 0) ? round(($asistencias / $total_clases) * 100) : 0;
-            }
-
-            function calcularCondicionCalificacion($calificacion, $parametros) {
-                if ($calificacion['parcial1'] >= $parametros['promocion'] && $calificacion['parcial2'] >= $parametros['promocion']) {
-                    return "Promoción";
-                } elseif ($calificacion['parcial1'] >= $parametros['regular'] || $calificacion['parcial2'] >= $parametros['regular']) {
-                    return "Regular";
-                } else {
-                    return "Libre";
-                }
-            }
-
-            // tabla
-            if (!empty($alumnos)): 
-                // total de clases
-                $stmt_total_clases = $conn->prepare("SELECT COUNT(DISTINCT fecha_asistencia) AS total_clases FROM asistencias WHERE id_materia = :id_materia");
-                $stmt_total_clases->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-                $stmt_total_clases->execute();
-                $total_clases = $stmt_total_clases->fetch(PDO::FETCH_ASSOC)['total_clases'];
-            ?>
                 <form method="post" action="">
                     <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
                     <h2>Alumnos Inscriptos</h2>
-                    <h4>Cantidad de Clases:  <?php echo $total_clases; ?></h4>
+                    <h4>Cantidad de Clases:  <?php echo $alumno->contarTotalClases($id_materia); ?></h4>
                     <table>
                         <thead>
                             <tr>
                                 <th>Apellido y Nombre</th>
+                                <th>Presente</th>
                                 <th>Asistencia (%)</th>
                                 <th>Calificaciones</th>
                                 <th>Condición</th>
@@ -206,72 +176,25 @@
                         <tbody>
                             <?php foreach ($alumnos as $alumno): ?>
                                 <tr>
-                                    <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
-                                    <td><?php echo calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn); ?>%</td>
-                                    <td>
-                                        <?php
-                                        // calificaciones
-                                        $stmt_calificaciones = $conn->prepare("SELECT parcial1, parcial2, final FROM calificaciones WHERE id_alumno = :id_alumno AND id_materia = :id_materia");
-                                        $stmt_calificaciones->bindParam(':id_alumno', $alumno['id_alumno'], PDO::PARAM_INT);
-                                        $stmt_calificaciones->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
-                                        $stmt_calificaciones->execute();
-                                        $calificacion = $stmt_calificaciones->fetch(PDO::FETCH_ASSOC);
-                                        echo !empty($calificacion) ? $calificacion['parcial1'] . " - " . $calificacion['parcial2']  . " - " . $calificacion['final'] : "No hay calificaciones";
-                                        ?>
-                                    </td>
-                                    <td>
-                                    <?php
-                                        // porcentaje de asistencia
-                                        $porcentaje_asistencia = calcularPorcentajeAsistencia($alumno['id_alumno'], $id_materia, $conn);
+                                    <td><?php echo $alumno->apellido . ", " . $alumno->nombre; ?></td>
+                                    <td><?php echo $alumno->contarTotalClasesAlumno($alumno->id_alumno, $id_materia); ?></td>
+                                    <td><?php echo $alumno->calcularPorcentajeAsistencia($alumno->id_alumno, $id_materia); ?>%</td>
+                                    <td><?php $calificacion = $alumno->calificacion($alumno->id_alumno, $id_materia);
+                                                if ($calificacion) {
+                                                    echo 'Parcial 1: ' . $calificacion['parcial1'] . ' | Parcial 2: ' . $calificacion['parcial2'] . ' | Final: ' . $calificacion['final'];
+                                                } else {
+                                                    echo 'No disponible';
+                                                }
+                                                ?></td>
+                                    <td><?php echo $alumno->evaluarCondicion($alumno->id_alumno, $id_materia, $id_instituto); ?></td>
+                                    <td>    <a href="../editar/editar_alumno.php">
+                                                <button type="button" style="background-color: yellow; color: black;">Editar</button>
+                                            </a>
 
-                                        // parámetros de evaluación
-                                        $stmt_parametros = $conn->prepare("SELECT * FROM parametros WHERE id_instituto = :id_instituto");
-                                        $stmt_parametros->bindParam(':id_instituto', $id_instituto, PDO::PARAM_INT);
-                                        $stmt_parametros->execute();
-                                        $parametros = $stmt_parametros->fetch(PDO::FETCH_ASSOC);
-
-                                        // verificación parámetros
-                                        if ($parametros === false) {
-                                            echo "Error al obtener los parámetros de evaluación.";
-                                        }
-
-                                        // condición de asistencia
-                                        $condicion_asistencia = '';
-                                        if ($porcentaje_asistencia >= $parametros['asistencias_promocion']) {
-                                            $condicion_asistencia = "Promoción";
-                                        } elseif ($porcentaje_asistencia >= $parametros['asistencias_regular']) {
-                                            $condicion_asistencia = "Regular";
-                                        } else {
-                                            $condicion_asistencia = "Libre";
-                                        }
-
-                                        // condición de calificaciones
-                                        $condicion_calificacion = '';
-                                        if (!empty($calificacion)) {
-                                            $condicion_calificacion = calcularCondicionCalificacion($calificacion, $parametros);
-                                        } else {
-                                            $condicion_calificacion = "No hay calificaciones";
-                                        }
-
-                                        // ambas condiciones
-                                        if ($condicion_calificacion === "No hay calificaciones") {
-                                            echo "No hay calificaciones para evaluar la condición";
-                                        } else {
-                                            if ($condicion_asistencia === "Promoción" && $condicion_calificacion === "Promoción") {
-                                                echo "Promoción";
-                                            } elseif ($condicion_asistencia === "Regular" && ($condicion_calificacion === "Regular" || $condicion_calificacion === "Promoción")) {
-                                                echo "Regular";
-                                            } else {
-                                                echo "Libre";
-                                            }
-                                        }
-                                    ?>
-                                    </td>
-                                    <td>
                                         <form action="" method="post">
                                             <input type="hidden" name="id_materia" value="<?php echo $id_materia; ?>">
-                                            <input type="hidden" name="id_alumno" value="<?php echo $alumno['id_alumno']; ?>">
-                                            <button type="button" onclick="darBaja(<?php echo $alumno['id_alumno']; ?>)">Eliminar Alumno</button>
+                                            <input type="hidden" name="id_alumno" value="<?php echo $alumno->id_alumno; ?>">
+                                            <button type="button" onclick="darBaja(<?php echo $alumno->id_alumno; ?>)">Eliminar</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -279,10 +202,10 @@
                         </tbody>
                     </table>
                 </form>
-            <?php else: ?>
-                <p>No hay alumnos registrados en esta materia.</p>
-            <?php endif; ?>
-        <?php endif; ?>
+            <?php elseif (isset($id_materia) && empty($alumnos)): ?>
+        <p>No hay alumnos registrados para esta materia.</p>
+<?php endif; ?>
+
     </body>
     <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,21 +1,16 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Busqueda.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Materia.php';
 
 $db = new Database();
 $conn = $db->connect();
-$busqueda = new Busqueda($conn);
 
-// Obtener institutos para el formulario
-$institutos = $busqueda->obtenerInstitutos();
 $materias = [];
+$id_instituto = null; 
 
-// Comprobar si se seleccionó un instituto
-if (isset($_POST['instituto']) && !empty($_POST['instituto'])) {
-    $id_instituto = $_POST['instituto'];
-    $materias = $busqueda->obtenerMateriasPorInstituto($id_instituto);
-}
+$materias = $materia->obtenerMaterias();
+    
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +24,7 @@ if (isset($_POST['instituto']) && !empty($_POST['instituto'])) {
     <link rel="icon" href="../../resources/img/favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <form action="procesar_registro_alumno.php" method="post">
+    <form action="procesar_registros/procesar_registro_alumno.php" method="post" id="registro-alumno">
         <h2>Registro de Alumno</h2>
 
         <div class="form-group">
@@ -54,33 +49,25 @@ if (isset($_POST['instituto']) && !empty($_POST['instituto'])) {
             </div>
         </div>
 
-        <!-- Selección de instituto -->
         <div class="form-group">
-            <label for="instituto"><b>Instituto</b></label>
-            <select name="instituto" id="instituto" required onchange="this.form.submit()">
-                <option value="">Seleccione un instituto</option>
-                <?php
-                    foreach ($institutos as $instituto) {
-                        $selected = (isset($id_instituto) && $id_instituto == $instituto['id_instituto']) ? 'selected' : '';
-                        echo "<option value='" . $instituto['id_instituto'] . "' $selected>" . $instituto['nombre_instituto'] . "</option>";
-                    }
-                ?>
-            </select>
-        </div>
-
-        <!-- Selección de materia -->
-        <div class="form-group">
-            <label for="materia"><b>Materia</b></label>
-            <select name="materia" id="materia" required>
-                <option value="">Seleccione una materia</option>
-                <?php
-                    if (!empty($materias)) {
-                        foreach ($materias as $materia) {
-                            echo "<option value='" . $materia['id_materia'] . "'>" . $materia['nombre_materia'] . "</option>";
+            <div class="half-width">
+                <label for="fecha_nacimiento"><b>Fecha Nacimiento</b></label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+            </div>
+            <div class="half-width">
+                <label for="materia"><b>Materia</b></label>
+                <select name="materia" id="materia" required>
+                    <option value="">Seleccione una materia</option>
+                    <?php
+                        if (!empty($materias)) {
+                            foreach ($materias as $materia) {
+                                echo "<option value='" . $materia['id_materia'] . "'>" . $materia['nombre_materia'] . "</option>";
+                            }
                         }
-                    }
-                ?>
-            </select>
+                    ?>
+                </select>
+
+            </div>
         </div>
 
         <button type="submit"><b>Registrar</b></button>
