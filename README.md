@@ -1,4 +1,4 @@
-# Firme-Como-Rulo
+# Firme Como Rulo
 
 Instalación:
 Copiar y descomprimir el archivo en la carpeta de proyectos de su servidor web. Al final tendrás una carpeta llamada "Firme Como Rulo", a la cual accederás desde el navegador como http://127.0.0.1/Firme%Como%Rulo/.
