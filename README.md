@@ -3,7 +3,8 @@
 Instalación:
 Copiar y descomprimir el archivo en la carpeta de proyectos de su servidor web. Al final tendrás una carpeta llamada "Firme Como Rulo", a la cual accederás desde el navegador como http://127.0.0.1/Firme%Como%Rulo/.
 
-Iniciar la base de datos: Antes de registrarse, los usuarios deben hacer clic en un botón que inicializará la base de datos si aún no está configurada.
+Iniciar la base de datos: 
+Antes de registrarse, los usuarios deben hacer clic en un botón que inicializará la base de datos si aún no está configurada.
 
 Paso 1: Dirígete a la página http://127.0.0.1/Firme%Como%Rulo/.
 Paso 2: Verás un botón con el texto "Iniciar Base de Datos". Al hacer clic en este botón, se ejecutará un script que creará la base de datos y las tablas necesarias si aún no existen. El proceso verificará la existencia de la base de datos antes de intentar crearla, para evitar errores si ya está configurada.
