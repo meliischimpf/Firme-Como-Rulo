@@ -9,6 +9,8 @@ Antes de registrarse, los usuarios deben hacer clic en un botón que inicializar
 Paso 1: Dirígete a la página http://127.0.0.1/Firme%Como%Rulo/.
 Paso 2: Verás un botón con el texto "Iniciar Base de Datos". Al hacer clic en este botón, se ejecutará un script que creará la base de datos y las tablas necesarias si aún no existen. El proceso verificará la existencia de la base de datos antes de intentar crearla, para evitar errores si ya está configurada.
 
-Configurar la conexión a la base de datos: Si es necesario, modifica el archivo http://127.0.0.1/Firme%Como%Rulo/conexion.php para actualizar los datos asociados al acceso a la base de datos, como el servidor, el usuario, la contraseña y el nombre de la base de datos.
+Configurar la conexión a la base de datos: 
+Si es necesario, modifica el archivo http://127.0.0.1/Firme%Como%Rulo/conexion.php para actualizar los datos asociados al acceso a la base de datos, como el servidor, el usuario, la contraseña y el nombre de la base de datos.
 
-Registro de usuario: Después de que la base de datos esté configurada, los usuarios pueden registrarse en el sistema utilizando un formulario de registro en el cual podrán ingresar sus datos como nombre, correo electrónico, contraseña, etc.
+Registro de usuario: 
+Después de que la base de datos esté configurada, los usuarios pueden registrarse en el sistema utilizando un formulario de registro en el cual podrán ingresar sus datos como nombre, correo electrónico, contraseña, etc.
