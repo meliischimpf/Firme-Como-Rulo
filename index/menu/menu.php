@@ -13,7 +13,7 @@
   <div class="container">
     <div class="sidebar">
      <span class="logo">S</span>
-     <img src="../resources/img/Logo Firme como Rulo.png" alt="logo"><a class="logo-expand" href="#">Firme Como Rulo</a></img>
+     <img src="../resources/img/Logo Firme como Rulo.png" alt="logo"><a class="logo-expand" href="../menu/menu.php">Firme Como Rulo</a></img>
      <div class="side-wrapper">
       <div class="side-title">MENU</div>
       <div class="side-menu">
