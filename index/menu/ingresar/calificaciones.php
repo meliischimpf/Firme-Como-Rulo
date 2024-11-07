@@ -108,7 +108,7 @@
         // selección materia
         if (isset($_POST['id_materia']) && !empty($_POST['id_materia'])) {
             $id_materia = $_POST['id_materia'];
-            // Obtener¿alumnos según la materia seleccionada
+            // obtener alumnos según la materia seleccionada
             $alumnos = $busqueda->obtenerAlumnosPorMateria($id_materia);
         }
     ?>

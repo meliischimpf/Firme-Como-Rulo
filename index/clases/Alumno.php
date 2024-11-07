@@ -10,6 +10,7 @@ class Alumno {
         public $mail, 
         public $fecha_nacimiento, 
         public $dni, 
+        public $materia,
         public $presente,
         public $parcial1,
         public $parcial2,
@@ -106,7 +107,19 @@ class Alumno {
         $stmt->execute();
     }
  
+    public function darAlta($conn) {
+        $sql = "INSERT INTO alumnos (apellido, nombre, dni, mail, fecha_nacimiento, id_materia)
+                VALUES (:apellido, :nombre, :dni, :mail, :fecha_nacimiento, :materia)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':apellido', $this->apellido);
+        $stmt->bindParam(':nombre', $this->nombre);
+        $stmt->bindParam(':dni', $this->dni);
+        $stmt->bindParam(':mail', $this->mail);
+        $stmt->bindParam(':fecha_nacimiento', $this->fecha_nacimiento);
+        $stmt->bindParam(':materia', $this->materia);
 
+        return $stmt->execute();
+    }
     
     public static function darBaja($id_alumno) {
         

@@ -4,28 +4,24 @@
     <meta charset="UTF-8">
     <title>Firme como Rulo</title>
     <style>
-        /* Ocultar el checkbox, pero mantener la funcionalidad */
         .labelcheck {
-            display: none; /* Oculta el checkbox real */
+            display: none; 
         }
 
-        /* Estilo para el label que funcionará como estrella */
         .labelcheck + label {
-            font-size: 30px; /* Tamaño de la estrella */
-            color: gray; /* Color inicial de la estrella */
-            cursor: pointer; /* Cambia el cursor al pasar sobre la estrella */
-            display: inline-block; /* Para asegurarse de que el label se comporte correctamente */
+            font-size: 30px; 
+            color: gray; 
+            cursor: pointer; 
+            display: inline-block; 
         }
 
-        /* Estilo para la estrella cuando está marcada */
         .labelcheck:checked + label {
-            color: gold; /* Cambia el color a dorado al marcar */
+            color: gold; 
         }
 
-        /* Estrella vacía usando pseudo-elemento */
         .labelcheck + label::before {
-            content: '★'; /* Agrega la estrella */
-            font-size: 30px; /* Tamaño de la estrella */
+            content: '★'; 
+            font-size: 30px;
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.css" />

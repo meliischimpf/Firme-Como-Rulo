@@ -172,12 +172,11 @@
     </form>
 </form>
 
-    </div>
+</div>
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
 <script src="../../resources/menu/sidebar.js"></script>
 <script src="../../resources/menu/ingresar/asistencia_fecha.js"></script>
-
 
 </html>
