@@ -87,7 +87,7 @@ class Alumno {
     
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
-    
+
 
     // registra o elimina asistencia
     public static function gestionarAsistencia($id_alumno, $id_materia, $presente, $fecha_asistencia = null) {
@@ -116,6 +116,32 @@ class Alumno {
         $stmt->execute();
     }
     
+    // obtiene el cumpleaños del alumno
+
+    public function verificarCumpleanios($fechaSeleccionada = null) {
+        $db = new Database();
+        $conn = $db->connect();
+
+        $query = "SELECT id_alumno, nombre_alumno, apellido_alumno, fecha_nacimiento_alumno FROM alumno";
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+        $alumnos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $cumpleaniosEnFecha = [];
+        $fechaActual = $fechaSeleccionada ? date('m-d', strtotime($fechaSeleccionada)) : date('m-d');
+
+        foreach ($alumnos as $alumno) {
+            $fechaNacimiento = date('m-d', strtotime($alumno['fecha_nacimiento_alumno'])); 
+
+            if ($fechaNacimiento === $fechaActual) {
+                $cumpleaniosEnFecha[] = $alumno;
+            }
+        }
+
+        return $cumpleaniosEnFecha; 
+    }
+
+    
 
     public static function gestionarNotas($id_alumno, $id_materia, $parcial1, $parcial2, $final) {
     
@@ -130,12 +156,12 @@ class Alumno {
         $existingRow = $stmtSelect->fetch(PDO::FETCH_ASSOC);
         
         if ($existingRow) {
-            // Si el valor de la nota está vacío, asignamos NULL
+            // si el valor de la nota está vacío, asignamos NULL
             $parcial1 = !empty($parcial1) ? $parcial1 : NULL;
             $parcial2 = !empty($parcial2) ? $parcial2 : NULL;
             $final = !empty($final) ? $final : NULL;
         } else {
-            // Si no existe el registro, asignamos NULL a todas las notas si no están definidas
+            // si no existe el registro, asignamos NULL a todas las notas si no están definidas
             $parcial1 = !empty($parcial1) ? $parcial1 : NULL;
             $parcial2 = !empty($parcial2) ? $parcial2 : NULL;
             $final = !empty($final) ? $final : NULL;

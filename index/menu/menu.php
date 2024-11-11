@@ -119,10 +119,6 @@
             <?php foreach ($materias as $materia): ?>
                 <li>
                     <?php echo $materia['nombre_materia']; ?>
-                    <div class="buttons">
-                        <a href="editar/editar_materia.php"><button>Editar</button></a>
-                        <button>Eliminar</button>
-                    </div>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -136,15 +132,6 @@
             <?php foreach ($institutos as $instituto): ?>
                 <li>
                     <?php echo $instituto['nombre_instituto']; ?>
-                    <div class="buttons">
-                        <a href="registrar/registrar_instituto.php?php echo $instituto['id_instituto']; ?>">
-                            <button>Editar</button>
-                        </a>
-                        <form action="procesar_registros/eliminar_instituto.php" method="post" style="display:inline;">
-                            <input type="hidden" name="id_instituto" value="<?php echo $instituto['id_instituto']; ?>">
-                            <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este instituto?')">Eliminar</button>
-                        </form>
-                    </div>
                 </li>
             <?php endforeach; ?>
         </ul>

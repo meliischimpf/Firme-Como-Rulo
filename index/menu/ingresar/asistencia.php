@@ -98,7 +98,13 @@
         $result_institutos = $instituto->obtenerInstitutos();
         $materias = [];
         $id_alumno_asistencia = []; // almacena IDs de alumnos con asistencia para la fecha seleccionada
-        $fecha_asistencia = date('Y-m-d'); // fecha actual como fecha predeterminada
+        $fecha_asistencia = isset($_POST['fecha_asistencia']) ? $_POST['fecha_asistencia'] : date('Y-m-d');
+
+        
+        $cumpleanierosEnFecha = $alumno->verificarCumpleanios($fecha_asistencia);
+        $idCumpleanieros = array_column($cumpleanierosEnFecha, 'id_alumno');
+
+
 
         // selección de instituto
         if (isset($_POST['id_instituto']) && !empty($_POST['id_instituto'])) {
@@ -164,16 +170,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($alumnos as $alumno): ?>
-                            <tr>
-                                <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
-                                <td>
-                                    <input type="checkbox" name="asistencia[<?php echo $alumno['id_alumno']; ?>]" value="1"
-                                        onchange="registrarAsistencia(<?php echo $alumno['id_alumno']; ?>, <?php echo $id_materia; ?>, this.checked)"
-                                        <?php echo in_array($alumno['id_alumno'], $id_alumno_asistencia) ? 'checked' : ''; ?>>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($alumnos as $alumno): ?>
+                        <tr>
+                            <td><?php echo $alumno['apellido_alumno'] . ", " . $alumno['nombre_alumno']; ?></td>
+                            <td>
+                                <input type="checkbox" name="asistencia[<?php echo $alumno['id_alumno']; ?>]" value="1"
+                                    onchange="registrarAsistencia(<?php echo $alumno['id_alumno']; ?>, <?php echo $id_materia; ?>, this.checked)"
+                                    <?php echo in_array($alumno['id_alumno'], $id_alumno_asistencia) ? 'checked' : ''; ?>
+                                    <?php echo in_array($alumno['id_alumno'], $idCumpleanieros) ? 'data-cumpleaniero="true"' : ''; ?>>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php elseif (isset($id_materia)): ?>
@@ -184,6 +191,30 @@
 
     </div>
 </body>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarCumpleanieros();
+    });
+
+    document.getElementById('fecha_asistencia').addEventListener('change', function() {
+        actualizarCumpleanieros();
+    });
+
+    function actualizarCumpleanieros() {
+        // eliminar el color de todos los checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+            checkbox.parentElement.style.backgroundColor = ''; 
+        });
+
+        // aplicar color a los checkboxes que tengan `data-cumpleaniero="true"`
+        document.querySelectorAll('input[type="checkbox"][data-cumpleaniero="true"]').forEach(function(checkbox) {
+            checkbox.parentElement.style.backgroundColor = '#ffeb3b';  
+        });
+    }
+
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sonner@latest/dist/sonner.umd.js"></script>
 <script src="../../resources/menu/sidebar.js"></script>
 <script src="../../resources/menu/ingresar/asistencia_fecha.js"></script>

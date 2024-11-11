@@ -19,12 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
 
-        $stmt = $conn->prepare('SELECT * FROM usuarios WHERE mail = :mail');
+        $stmt = $conn->prepare('SELECT * FROM usuarios WHERE mail_usuario = :mail');
         $stmt->bindParam(':mail', $mail, PDO::PARAM_STR);
         $stmt->execute();
   
         $mail_db = $stmt->fetch(PDO::FETCH_ASSOC); 
-        if ($mail_db['password'] == $password) {
+        if ($mail_db['password_usuario'] == $password) {
             header("Location: menu/menu.php");
             exit();
         } else {
