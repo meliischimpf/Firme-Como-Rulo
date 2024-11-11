@@ -144,7 +144,6 @@ class Alumno {
     
 
     public static function gestionarNotas($id_alumno, $id_materia, $parcial1, $parcial2, $final) {
-    
         $db = new Database();
         $conn = $db->connect();
     
@@ -154,39 +153,35 @@ class Alumno {
         $stmtSelect->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
         $stmtSelect->execute();
         $existingRow = $stmtSelect->fetch(PDO::FETCH_ASSOC);
-        
+    
+        // si existe, solo se actualiza lo que se ingresa
         if ($existingRow) {
-            // si el valor de la nota está vacío, asignamos NULL
-            $parcial1 = !empty($parcial1) ? $parcial1 : NULL;
-            $parcial2 = !empty($parcial2) ? $parcial2 : NULL;
-            $final = !empty($final) ? $final : NULL;
-        } else {
-            // si no existe el registro, asignamos NULL a todas las notas si no están definidas
-            $parcial1 = !empty($parcial1) ? $parcial1 : NULL;
-            $parcial2 = !empty($parcial2) ? $parcial2 : NULL;
-            $final = !empty($final) ? $final : NULL;
+            $parcial1 = ($parcial1 !== "") ? $parcial1 : $existingRow['parcial1'];
+            $parcial2 = ($parcial2 !== "") ? $parcial2 : $existingRow['parcial2'];
+            $final = ($final !== "") ? $final : $existingRow['final'];
         }
     
+        // inserta o actualiza las notas nuevas
         $query = "INSERT INTO calificaciones (id_alumno, id_materia, parcial1, parcial2, final) 
                   VALUES (:id_alumno, :id_materia, :parcial1, :parcial2, :final) 
                   ON DUPLICATE KEY UPDATE 
                   parcial1 = :new_parcial1, 
                   parcial2 = :new_parcial2, 
                   final = :new_final";
-        
+    
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':id_alumno', $id_alumno, PDO::PARAM_INT);
         $stmt->bindParam(':id_materia', $id_materia, PDO::PARAM_INT);
         $stmt->bindParam(':parcial1', $parcial1, PDO::PARAM_STR);
         $stmt->bindParam(':parcial2', $parcial2, PDO::PARAM_STR);
         $stmt->bindParam(':final', $final, PDO::PARAM_STR);
-        
         $stmt->bindParam(':new_parcial1', $parcial1, PDO::PARAM_STR);
         $stmt->bindParam(':new_parcial2', $parcial2, PDO::PARAM_STR);
         $stmt->bindParam(':new_final', $final, PDO::PARAM_STR);
-        
+    
         $stmt->execute();
     }
+    
     
     
     public function darAlta($id_materia) {
