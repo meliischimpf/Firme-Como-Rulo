@@ -13,7 +13,7 @@ Hay dos maneras de levantar el servidor.
 
 **1-** Utilizando Laragon: al introducir la carpeta del proyecto en "www", carpeta del directorio de laragon.
 
-**2- **Por medio de cmd, levantandolo con el comando "php -S localhost:80".
+**2- ** Por medio de cmd, levantandolo con el comando **"php -S localhost:80"** .
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ Antes de registrarse, los usuarios **deben** hacer clic en un botón que inicial
 
 **Paso 1:** Dirígete a la página http://localhost/Firme_Como_Rulo/.
 
-**Paso 2: **Verás un botón con el texto "Iniciar Base de Datos". Al hacer clic en este botón, se ejecutará un script que creará la base de datos y las tablas necesarias si aún no existen. El proceso verificará la existencia de la base de datos antes de intentar crearla, para evitar errores si ya está configurada.
+**Paso 2: ** Verás un botón con el texto "Iniciar Base de Datos". Al hacer clic en este botón, se ejecutará un script que creará la base de datos y las tablas necesarias si aún no existen. El proceso verificará la existencia de la base de datos antes de intentar crearla, para evitar errores si ya está configurada.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
