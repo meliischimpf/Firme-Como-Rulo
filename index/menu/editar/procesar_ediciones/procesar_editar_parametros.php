@@ -1,6 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/ParametrosEvaluacion.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/conexion.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/clases/ParametrosEvaluacion.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_instituto'], $_POST['promocion'], $_POST['asistencia_promocion'], $_POST['regular'], $_POST['asistencia_regular'], $_POST['libre'], $_POST['asistencia_libre'])) {
     $id_instituto = $_POST['id_instituto'];

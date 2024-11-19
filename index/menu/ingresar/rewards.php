@@ -108,10 +108,10 @@
         <a href="../registros/registrar_alumno.php"><button value="anadir alumno"> + Alumno</button></a>
     </div>
     <?php
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/conexion.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Alumno.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Materia.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Instituto.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/conexion.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/clases/Alumno.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/clases/Materia.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/clases/Instituto.php';
 
         $db = new Database();
         $conn = $db->connect();

@@ -2,7 +2,7 @@
 // Verifica si se pasó un id_instituto para editar
 if (isset($_GET['id_instituto'])) {
     // Carga los datos del instituto desde la base de datos para la edición
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme como Rulo/index/clases/Instituto.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/Firme_Como_Rulo/index/clases/Instituto.php';
     $instituto = Instituto::crearInstitutoDesdeID($_GET['id_instituto']);
 }
 ?>
