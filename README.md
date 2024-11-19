@@ -1,7 +1,7 @@
 # Firme Como Rulo
 
 Instalación:
-Copiar y descomprimir el archivo en la carpeta de proyectos de su servidor web. Al final tendrás una carpeta llamada "Firme_Como_Rulo", a la cual accederás desde el navegador como http://localhost/Firme%20como%20Rulo/.
+Copiar y descomprimir el archivo en la carpeta de proyectos de su servidor web. Al final tendrás una carpeta llamada "Firme_Como_Rulo", a la cual accederás desde el navegador como http://localhost/Firme_Como_Rulo/.
 
 Iniciar la base de datos: 
 Antes de registrarse, los usuarios deben hacer clic en un botón que inicializará la base de datos si aún no está configurada.
